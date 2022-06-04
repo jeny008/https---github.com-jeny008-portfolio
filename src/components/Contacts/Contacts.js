@@ -9,7 +9,7 @@ import {
     FaLinkedinIn,
     FaGithub,
     FaYoutube,
-    FaBloggerB,
+    FaFacebook,
     FaRedditAlien,
     FaStackOverflow,
     FaCodepen,
@@ -20,12 +20,11 @@ import {
 import { AiOutlineSend, AiOutlineCheckCircle } from 'react-icons/ai';
 import { FiPhone, FiAtSign } from 'react-icons/fi';
 import { HiOutlineLocationMarker } from 'react-icons/hi';
-
 import { ThemeContext } from '../../contexts/ThemeContext';
-
 import { socialsData } from '../../data/socialsData';
 import { contactsData } from '../../data/contactsData';
 import './Contacts.css';
+import { useForm, ValidationError } from '@formspree/react';
 
 function Contacts() {
     const [open, setOpen] = useState(false);
@@ -37,15 +36,10 @@ function Contacts() {
     const [success, setSuccess] = useState(false);
     const [errMsg, setErrMsg] = useState('');
 
+
+
+
     const { theme } = useContext(ThemeContext);
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setOpen(false);
-    };
 
     const useStyles = makeStyles((t) => ({
         input: {
@@ -126,40 +120,12 @@ function Contacts() {
             },
         },
     }));
-
     const classes = useStyles();
-
-    const handleContactForm = (e) => {
-        e.preventDefault();
-
-        if (name && email && message) {
-            if (isEmail(email)) {
-                const responseData = {
-                    name: name,
-                    email: email,
-                    message: message,
-                };
-
-                axios.post(contactsData.sheetAPI, responseData).then((res) => {
-                    console.log('success');
-                    setSuccess(true);
-                    setErrMsg('');
-
-                    setName('');
-                    setEmail('');
-                    setMessage('');
-                    setOpen(false);
-                });
-            } else {
-                setErrMsg('Invalid email');
-                setOpen(true);
-            }
-        } else {
-            setErrMsg('Enter all the fields');
-            setOpen(true);
-        }
-    };
-
+    const [state, handleSubmit] = useForm("xgeddgqa");
+    if (state.succeeded) {
+        return <p style={{color:"white", backgroundColor:"rgb(0,20,25)", fontSize:"20px"}}><i><b>Your Message has been mailed successfully to Jenny Tandel !!</b></i></p>;
+    }
+    
     return (
         <div
             className='contacts'
@@ -170,19 +136,18 @@ function Contacts() {
                 <h1 style={{ color: theme.primary }}>Contacts</h1>
                 <div className='contacts-body'>
                     <div className='contacts-form'>
-                        <form onSubmit={handleContactForm}>
+                        <form onSubmit={handleSubmit}>
                             <div className='input-container'>
                                 <label htmlFor='Name' className={classes.label}>
                                     Name
                                 </label>
                                 <input
-                                    placeholder='Jenny'
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder='jenny'
+                                    id='name'
                                     type='text'
-                                    name='Name'
+                                    name='name'                                   
                                     className={`form-input ${classes.input}`}
-                                />
+                                />                                
                             </div>
                             <div className='input-container'>
                                 <label
@@ -193,11 +158,15 @@ function Contacts() {
                                 </label>
                                 <input
                                     placeholder='jenytandel008@gmail.com'
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    type='email'
-                                    name='Email'
+                                    id="email"
+                                    type="email"
+                                    name="email"
                                     className={`form-input ${classes.input}`}
+                                />
+                                <ValidationError
+                                    prefix="Email"
+                                    field="email"
+                                    errors={state.errors}
                                 />
                             </div>
                             <div className='input-container'>
@@ -209,41 +178,24 @@ function Contacts() {
                                 </label>
                                 <textarea
                                     placeholder='Type your message....'
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    type='text'
-                                    name='Message'
+                                    id="message"
+                                    name="message"
                                     className={`form-message ${classes.message}`}
                                 />
+                                <ValidationError
+                                    prefix="Message"
+                                    field="message"
+                                    errors={state.errors}
+                                />
                             </div>
-
                             <div className='submit-btn'>
                                 <button
                                     type='submit'
-                                    className={classes.submitBtn}
+                                    disabled={state.submitting}
                                 >
-                                    <p>{!success ? 'Send' : 'Sent'}</p>
-                                    <div className='submit-icon'>
-                                        <AiOutlineSend
-                                            className='send-icon'
-                                            style={{
-                                                animation: !success
-                                                    ? 'initial'
-                                                    : 'fly 0.8s linear both',
-                                                position: success
-                                                    ? 'absolute'
-                                                    : 'initial',
-                                            }}
-                                        />
-                                        <AiOutlineCheckCircle
-                                            className='success-icon'
-                                            style={{
-                                                display: !success
-                                                    ? 'none'
-                                                    : 'inline-flex',
-                                                opacity: !success ? '0' : '1',
-                                            }}
-                                        />
+                                    <div className='submit-icon' >
+                                        <AiOutlineSend className='send-icon'/>
+                                        
                                     </div>
                                 </button>
                             </div>
@@ -253,9 +205,7 @@ function Contacts() {
                                 vertical: 'top',
                                 horizontal: 'center',
                             }}
-                            open={open}
                             autoHideDuration={4000}
-                            onClose={handleClose}
                         >
                             <SnackbarContent
                                 action={
@@ -264,7 +214,6 @@ function Contacts() {
                                             size='small'
                                             aria-label='close'
                                             color='inherit'
-                                            onClick={handleClose}
                                         >
                                             <CloseIcon fontSize='small' />
                                         </IconButton>
@@ -275,10 +224,39 @@ function Contacts() {
                                     color: theme.secondary,
                                     fontFamily: 'var(--primaryFont)',
                                 }}
-                                message={errMsg}
                             />
                         </Snackbar>
                     </div>
+                    {/* <form onSubmit={handleSubmit}>
+                        <label htmlFor="email">
+                            Email Address
+                        </label>
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                        />
+                        <ValidationError
+                            prefix="Email"
+                            field="email"
+                            errors={state.errors}
+                        />
+                        <textarea
+                            id="message"
+                            name="message"
+                        />
+                        <ValidationError
+                            prefix="Message"
+                            field="message"
+                            errors={state.errors}
+                        />
+                        <button type="submit" disabled={state.submitting}>
+                            Submit
+                        </button>
+                    </form> */}
+
+
+
 
                     <div className='contacts-details'>
                         <a
@@ -313,7 +291,7 @@ function Contacts() {
                         </div>
 
                         <div className='socialmedia-icons'>
-                            {socialsData.twitter && (
+                            {/* {socialsData.twitter && (
                                 <a
                                     href={socialsData.twitter}
                                     target='_blank'
@@ -322,7 +300,7 @@ function Contacts() {
                                 >
                                     <FaTwitter aria-label='Twitter' />
                                 </a>
-                            )}
+                            )} */}
                             {socialsData.github && (
                                 <a
                                     href={socialsData.github}
@@ -343,7 +321,7 @@ function Contacts() {
                                     <FaLinkedinIn aria-label='LinkedIn' />
                                 </a>
                             )}
-                            {/* {socialsData.instagram && (
+                            {socialsData.instagram && (
                                 <a
                                     href={socialsData.instagram}
                                     target='_blank'
@@ -352,7 +330,7 @@ function Contacts() {
                                 >
                                     <FaInstagram aria-label='Instagram' />
                                 </a>
-                            )} */}
+                            )}
                             {socialsData.medium && (
                                 <a
                                     href={socialsData.medium}
@@ -363,14 +341,14 @@ function Contacts() {
                                     <FaMediumM aria-label='Medium' />
                                 </a>
                             )}
-                            {socialsData.blogger && (
+                            {socialsData.facebook && (
                                 <a
-                                    href={socialsData.blogger}
+                                    href={socialsData.facebook}
                                     target='_blank'
                                     rel='noreferrer'
                                     className={classes.socialIcon}
                                 >
-                                    <FaBloggerB aria-label='Blogger' />
+                                    <FaFacebook aria-label='Facebook' />
                                 </a>
                             )}
                             {socialsData.youtube && (
@@ -383,7 +361,7 @@ function Contacts() {
                                     <FaYoutube aria-label='YouTube' />
                                 </a>
                             )}
-                            {socialsData.reddit && (
+                            {/* {socialsData.reddit && (
                                 <a
                                     href={socialsData.reddit}
                                     target='_blank'
@@ -422,7 +400,7 @@ function Contacts() {
                                 >
                                     <FaGitlab aria-label='GitLab' />
                                 </a>
-                            )}
+                            )} */}
                         </div>
                     </div>
                 </div>
