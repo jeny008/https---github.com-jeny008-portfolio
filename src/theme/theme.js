@@ -225,8 +225,8 @@ export const orangeThemeDark = {
 
 export const purpleThemeLight = {
     type: 'light',
-    primary: '#823ae0',
-    primary400: '#9456e5',
+    primary: '#80618c',
+    primary400: '#9167a0',
     primary600: '#762ad9',
     primary80: '#823ae0cc',
     primary50: '#823ae080',

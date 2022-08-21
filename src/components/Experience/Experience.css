@@ -153,12 +153,12 @@
     
     .experience-details > h4 {
         font-size: 1.125rem;
-        line-height: 150%;
+        line-height: 126%;
     }
     
-    .experience-details > h3 {
+    .experience-details > h5 {
         font-size: 1.05rem;
-        line-height: 150%;
+        line-height: 126%;
     }
 }
 

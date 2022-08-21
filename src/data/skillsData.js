@@ -12,7 +12,7 @@
     'MongoDB',
     'Wordpress',
     'Microsoft Office',
-    // 'MySQL ',
+    'MySQL ',
         'HTML',
         'CSS',
         'Javascript',

@@ -22,8 +22,8 @@ function Experience() {
                         <ExperienceCard 
                             key={exp.id}
                             id={exp.id}
-                            company={exp.company}
                             jobtitle={exp.jobtitle}
+                            company={exp.company}
                             startYear={exp.startYear}
                             endYear={exp.endYear}/>
                     ))}
